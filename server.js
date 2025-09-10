@@ -7,7 +7,7 @@ const WebSocket = require('ws');
 // =======================================================================
 // --- НАСТРОЙКИ: Ваши данные уже вставлены ---
 // =======================================================================
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;'8334998185:AAG6osIID7p08ZEaKPHODqi5QIgKctIeW4w'
 const CHAT_ID = -4871495058; 
 // =======================================================================
 
